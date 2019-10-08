@@ -1,0 +1,16 @@
+package Router
+
+import (
+	"file-server/Controllers"
+	"github.com/gin-gonic/gin"
+)
+
+func InitRouter() {
+	router := gin.Default()
+	v1 := router.Group("v1")
+	{
+		v1.POST("/testinsert", Controllers.TestInsert)
+		v1.POST("/upload", Controllers.Upload)
+	}
+	router.Run(":8622")
+}
