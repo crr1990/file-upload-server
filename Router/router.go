@@ -1,7 +1,7 @@
 package Router
 
 import (
-	"file-server/Controllers"
+	"file-upload-server/Controllers"
 	"github.com/gin-gonic/gin"
 )
 
