@@ -43,8 +43,8 @@ func Upload(c *gin.Context) {
 	//chunkNumber := c.PostForm("totalSize")
 	identifier := c.PostForm("identifier")
 	name := c.PostForm("filename")
-	relativePath := c.PostForm("relativePath")
-	PathInfo = PathInfo + "/"+ relativePath
+	savePath := c.PostForm("savePath")
+	PathInfo = PathInfo + "/"+ savePath
 
 	file, err := c.FormFile("file")
 	if err != nil {
