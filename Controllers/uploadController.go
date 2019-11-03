@@ -12,7 +12,7 @@ import (
 	"time"
 )
 
-var PathInfo = "/my/uploads"
+var BathPathInfo = "/my/uploads"
 
 type UploadNames struct {
 	Name    string
@@ -44,7 +44,7 @@ func Upload(c *gin.Context) {
 	identifier := c.PostForm("identifier")
 	name := c.PostForm("filename")
 	savePath := c.PostForm("savePath")
-	PathInfo = PathInfo + "/"+ savePath
+	pathInfo := BathPathInfo + "/"+ savePath
 
 	file, err := c.FormFile("file")
 	if err != nil {
@@ -58,15 +58,15 @@ func Upload(c *gin.Context) {
 
 	data := UploadNames{name, chunkNumber, file, fileStuffix, identifier}
 
-	if ok, _ := PathExists(PathInfo + "/" + data.Guid); ok {
+	if ok, _ := PathExists(pathInfo + "/" + data.Guid); ok {
 
 	} else {
-		os.MkdirAll(PathInfo+"/"+data.Guid, 0777)
+		os.MkdirAll(pathInfo+"/"+data.Guid, 0777)
 	}
-	c.SaveUploadedFile(file, PathInfo+"/"+data.Guid+"/"+data.Ids+data.Stuffix)
+	c.SaveUploadedFile(file, pathInfo+"/"+data.Guid+"/"+data.Ids+data.Stuffix)
 
 	if totalChunks == chunkNumber {
-		DoneMergeFile(identifier, fileStuffix)
+		DoneMergeFile(identifier, fileStuffix,pathInfo )
 	}
 
 	c.JSON(http.StatusOK, gin.H{
@@ -75,23 +75,23 @@ func Upload(c *gin.Context) {
 	})
 }
 
-func DoneMergeFile(guid string, suffix string) {
-	if ok, _ := PathExists(PathInfo + "/" + guid); ok {
+func DoneMergeFile(guid string, suffix string,pathInfo string) {
+	if ok, _ := PathExists(pathInfo + "/" + guid); ok {
 		var data []string
 		data = make([]string, 0)
-		fileInfo, _ := ioutil.ReadDir(PathInfo + "/" + guid)
+		fileInfo, _ := ioutil.ReadDir(pathInfo + "/" + guid)
 		for _, val := range fileInfo {
 			data = append(data, val.Name())
 		}
 
 		sort.Strings(data)
-		f, _ := os.OpenFile(PathInfo+"/"+guid+suffix, os.O_CREATE|os.O_APPEND|os.O_RDWR, 0777)
+		f, _ := os.OpenFile(pathInfo+"/"+guid+suffix, os.O_CREATE|os.O_APPEND|os.O_RDWR, 0777)
 		for _, val := range data {
-			contents, _ := ioutil.ReadFile(PathInfo + "/" + guid + "/" + val)
+			contents, _ := ioutil.ReadFile(pathInfo + "/" + guid + "/" + val)
 			f.Write(contents)
-			os.Remove(PathInfo + "/" + guid + "/" + val)
+			os.Remove(pathInfo + "/" + guid + "/" + val)
 		}
-		os.Remove(PathInfo + "/" + guid)
+		os.Remove(pathInfo + "/" + guid)
 		defer f.Close()
 	}
 }
