@@ -35,10 +35,15 @@ func TestInsert(c *gin.Context) {
 }
 
 func Upload(c *gin.Context) {
-	name := c.PostForm("name")
-	index := c.PostForm("chunk")
-	guid := c.PostForm("guid")
-	isLast := c.PostForm("is_last")
+	// new
+	chunkNumber := c.PostForm("chunkNumber")
+	totalChunks := c.PostForm("totalChunks")
+	//chunkSize := c.PostForm("chunkSize")
+	//chunkNumber := c.PostForm("currentChunkSize")
+	//chunkNumber := c.PostForm("totalSize")
+	identifier := c.PostForm("identifier")
+	name := c.PostForm("filename")
+	//relativePath := c.PostForm("relativePath")
 
 	file, err := c.FormFile("file")
 	if err != nil {
@@ -48,11 +53,9 @@ func Upload(c *gin.Context) {
 
 	filename := file.Filename
 	fileStuffix := path.Ext(filename)
-	if index == "" {
-		index = "0"
-	}
 
-	data := UploadNames{name, index, file, fileStuffix, guid}
+
+	data := UploadNames{name, chunkNumber, file, fileStuffix, identifier}
 
 	if ok, _ := PathExists(PathInfo + "/" + data.Guid); ok {
 
@@ -61,12 +64,12 @@ func Upload(c *gin.Context) {
 	}
 	c.SaveUploadedFile(file, PathInfo+"/"+data.Guid+"/"+data.Ids+data.Stuffix)
 
-	if isLast == "1" {
-		DoneMergeFile(guid, fileStuffix)
+	if totalChunks == chunkNumber {
+		DoneMergeFile(identifier, fileStuffix)
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"code": 1,
+		"successStatuses": 200,
 		"message": "success",
 	})
 }
