@@ -75,8 +75,7 @@ func DeleteFile(c *gin.Context) {
 	filePath := c.PostForm("savePath") //源文件路径
 
 	//删除文件
-	cuowu := os.Remove(BathPathInfo + "/" + filePath)
-
+	cuowu := os.RemoveAll(BathPathInfo + "/" + filePath+"/")
 	if cuowu != nil {
 		//如果删除失败则输出 file remove Error!
 		fmt.Println("file remove Error!")
