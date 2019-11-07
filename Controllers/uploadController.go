@@ -66,7 +66,7 @@ func Upload(c *gin.Context) {
 	c.SaveUploadedFile(file, pathInfo+"/"+data.Guid+"/"+data.Ids+data.Stuffix)
 
 	c.JSON(http.StatusOK, gin.H{
-		"successStatuses": 200,
+		"code": 0,
 		"message":         "success",
 	})
 }
@@ -89,6 +89,7 @@ func DeleteFile(c *gin.Context) {
 	//返回结果
 	c.JSON(http.StatusOK, gin.H{
 		"success": isremove,
+		"code":0,
 	})
 }
 
