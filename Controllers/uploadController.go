@@ -23,6 +23,16 @@ type UploadNames struct {
 	Guid    string
 }
 
+type s_data struct {
+	Identifier string
+	Suffix     string
+	SavePath   string
+}
+
+type DeleteFileData struct {
+	SavePath   string
+}
+
 func TestInsert(c *gin.Context) {
 	year := time.Now().Year()
 	month := int(time.Now().Month())
@@ -36,17 +46,17 @@ func TestInsert(c *gin.Context) {
 }
 
 func Upload(c *gin.Context) {
-	// new
 	chunkNumber := c.PostForm("chunkNumber")
-	//totalChunks := c.PostForm("totalChunks")
-	//chunkSize := c.PostForm("chunkSize")
-	//chunkNumber := c.PostForm("currentChunkSize")
-	//chunkNumber := c.PostForm("totalSize")
 	identifier := c.PostForm("identifier")
 	name := c.PostForm("filename")
 	savePath := c.PostForm("savePath")
-	pathInfo := BathPathInfo + "/" + savePath
+	if savePath == "" {
+		c.String(http.StatusBadRequest, "参数不能为空")
+		return
+	}
 
+	pathInfo := BathPathInfo + "/"+savePath
+	log.Println(pathInfo)
 	file, err := c.FormFile("file")
 	if err != nil {
 		c.String(http.StatusBadRequest, "a bad request")
@@ -66,16 +76,18 @@ func Upload(c *gin.Context) {
 	c.SaveUploadedFile(file, pathInfo+"/"+data.Guid+"/"+data.Ids+data.Stuffix)
 
 	c.JSON(http.StatusOK, gin.H{
-		"code": 0,
-		"message":         "success",
+		"code":    0,
+		"message": "success",
 	})
 }
 func DeleteFile(c *gin.Context) {
-	isremove := false          //删除文件是否成功
-	filePath := c.PostForm("savePath") //源文件路径
+	isremove := false //删除文件是否成功
+	var d  DeleteFileData
+	c.BindJSON(&d)
+
 
 	//删除文件
-	cuowu := os.RemoveAll(BathPathInfo + "/" + filePath+"/")
+	cuowu := os.RemoveAll(BathPathInfo + "/" + d.SavePath + "/")
 	if cuowu != nil {
 		//如果删除失败则输出 file remove Error!
 		fmt.Println("file remove Error!")
@@ -89,19 +101,33 @@ func DeleteFile(c *gin.Context) {
 	//返回结果
 	c.JSON(http.StatusOK, gin.H{
 		"success": isremove,
-		"code":0,
+		"code":    0,
 	})
 }
 
 func MergeFile(c *gin.Context) {
-	identifier := c.PostForm("identifier")
-	suffix := c.PostForm("suffix")
-	pathInfo := c.PostForm("savePath")
-	DoneMergeFile(identifier, suffix, BathPathInfo+"/"+pathInfo)
+	var p s_data
+	c.BindJSON(&p)
+
+	var code int
+	var msg string
+
+	if p.Identifier == "" {
+		code = 1001
+		msg = "Identifier is null."
+	} else if p.Suffix == "" {
+		code = 1001
+		msg = "Suffix is null."
+	} else if p.SavePath == "" {
+		code = 1001
+		msg = "SavePath is null."
+	} else {
+		DoneMergeFile(p.Identifier, p.Suffix, BathPathInfo+"/"+p.SavePath)
+	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"successStatuses": 200,
-		"message":         "success",
+		"successStatuses": code,
+		"message":         msg,
 	})
 }
 
