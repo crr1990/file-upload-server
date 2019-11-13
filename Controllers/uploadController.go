@@ -122,11 +122,12 @@ func MergeFile(c *gin.Context) {
 		code = 1001
 		msg = "SavePath is null."
 	} else {
+		code = 0
 		DoneMergeFile(p.Identifier, p.Suffix, BathPathInfo+"/"+p.SavePath)
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"successStatuses": code,
+		"code": code,
 		"message":         msg,
 	})
 }
