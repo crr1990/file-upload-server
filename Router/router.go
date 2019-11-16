@@ -27,7 +27,6 @@ func CorsMiddleware() gin.HandlerFunc {
 			c.Header("Access-Control-Allow-Origin", "*")
 			c.Header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
 			c.Header("Access-Control-Allow-Methods", "GET, OPTIONS, POST, PUT, DELETE")
-			c.Set("content-type", "application/json")
 
 		//放行所有OPTIONS方法
 		if method == "OPTIONS" {
