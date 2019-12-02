@@ -13,7 +13,7 @@ import (
 	"log"
 )
 
-var BathPathInfo = "/my/uploads"
+var BathPathInfo = "D:/CUSTOMER"
 
 type UploadNames struct {
 	Name    string
