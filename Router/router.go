@@ -24,7 +24,7 @@ func CorsMiddleware() gin.HandlerFunc {
 		method := c.Request.Method
 
 			// 核心处理方式
-			c.Header("Access-Control-Allow-Origin", "http://47.102.149.201:8622")
+			c.Header("Access-Control-Allow-Origin", "http://47.102.149.201:8620")
 			c.Header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
 			c.Header("Access-Control-Allow-Methods", "GET, OPTIONS, POST, PUT, DELETE")
 			c.Header("Access-Control-Max-Age", "1800")
