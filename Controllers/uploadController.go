@@ -11,9 +11,11 @@ import (
 	"sort"
 	"time"
 	"log"
+	"strconv"
 )
 
-var BathPathInfo = "D:/CUSTOMER"
+//var BathPathInfo = "D:/CUSTOMER"
+var BathPathInfo = "/my/upload"
 
 type UploadNames struct {
 	Name    string
@@ -30,7 +32,7 @@ type s_data struct {
 }
 
 type DeleteFileData struct {
-	SavePath   string
+	SavePath string
 }
 
 func TestInsert(c *gin.Context) {
@@ -55,7 +57,7 @@ func Upload(c *gin.Context) {
 		return
 	}
 
-	pathInfo := BathPathInfo + "/"+savePath
+	pathInfo := BathPathInfo + "/" + savePath
 	log.Println(pathInfo)
 	file, err := c.FormFile("file")
 	if err != nil {
@@ -73,7 +75,7 @@ func Upload(c *gin.Context) {
 	} else {
 		os.MkdirAll(pathInfo+"/"+data.Guid, 0777)
 	}
-	c.SaveUploadedFile(file, pathInfo+"/"+data.Guid+"/"+data.Ids+data.Stuffix)
+	c.SaveUploadedFile(file, pathInfo+"/"+data.Guid+"/"+data.Ids)
 
 	c.JSON(http.StatusOK, gin.H{
 		"code":    0,
@@ -82,9 +84,8 @@ func Upload(c *gin.Context) {
 }
 func DeleteFile(c *gin.Context) {
 	isremove := false //删除文件是否成功
-	var d  DeleteFileData
+	var d DeleteFileData
 	c.BindJSON(&d)
-
 
 	//删除文件
 	cuowu := os.RemoveAll(BathPathInfo + "/" + d.SavePath + "/")
@@ -127,26 +128,30 @@ func MergeFile(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"code": code,
-		"message":         msg,
+		"code":    code,
+		"message": msg,
 	})
 }
 
 func DoneMergeFile(guid string, suffix string, pathInfo string) {
+	log.Println(pathInfo + "/" + guid)
+	log.Println(PathExists(pathInfo + "/" + guid))
 	if ok, _ := PathExists(pathInfo + "/" + guid); ok {
-		var data []string
-		data = make([]string, 0)
+		var data []int
+		data = make([]int, 0)
 		fileInfo, _ := ioutil.ReadDir(pathInfo + "/" + guid)
 		for _, val := range fileInfo {
-			data = append(data, val.Name())
+			d, _ := strconv.Atoi(val.Name())
+			data = append(data, d)
 		}
 
-		sort.Strings(data)
+		sort.Ints(data)
+		log.Println(data)
 		f, _ := os.OpenFile(pathInfo+"/"+guid+suffix, os.O_CREATE|os.O_APPEND|os.O_RDWR, 0777)
 		for _, val := range data {
-			contents, _ := ioutil.ReadFile(pathInfo + "/" + guid + "/" + val)
+			contents, _ := ioutil.ReadFile(pathInfo + "/" + guid + "/" + strconv.Itoa(val))
 			f.Write(contents)
-			os.Remove(pathInfo + "/" + guid + "/" + val)
+			os.Remove(pathInfo + "/" + guid + "/" + strconv.Itoa(val))
 		}
 		os.Remove(pathInfo + "/" + guid)
 		defer f.Close()
