@@ -14,8 +14,8 @@ import (
 	"strconv"
 )
 
-//var BathPathInfo = "D:/CUSTOMER"
-var BathPathInfo = "/my/upload"
+var BathPathInfo = "D:/CUSTOMER"
+//var BathPathInfo = "/my/upload"
 
 type UploadNames struct {
 	Name    string
