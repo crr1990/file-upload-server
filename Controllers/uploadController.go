@@ -70,10 +70,10 @@ func Upload(c *gin.Context) {
 
 	data := UploadNames{name, chunkNumber, file, fileStuffix, identifier}
 	log.Println("pathInfo:" + pathInfo)
-	if ok, _ := PathExists(pathInfo + "/" + data.Guid); ok {
+	if ok, _ := PathExists(pathInfo + "/" + filename); ok {
 
 	} else {
-		os.MkdirAll(pathInfo+"/"+data.Guid, 0777)
+		os.MkdirAll(pathInfo+"/"+filename, 0777)
 	}
 	c.SaveUploadedFile(file, pathInfo+"/"+data.Guid+"/"+data.Ids)
 
