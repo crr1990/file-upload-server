@@ -29,6 +29,7 @@ type s_data struct {
 	Identifier string
 	Suffix     string
 	SavePath   string
+	FileName   string
 }
 
 type DeleteFileData struct {
@@ -124,7 +125,7 @@ func MergeFile(c *gin.Context) {
 		msg = "SavePath is null."
 	} else {
 		code = 0
-		DoneMergeFile(p.Identifier, p.Suffix, BathPathInfo+"/"+p.SavePath)
+		DoneMergeFile(p.Identifier, p.FileName, BathPathInfo+"/"+p.SavePath)
 	}
 
 	c.JSON(http.StatusOK, gin.H{
@@ -133,7 +134,7 @@ func MergeFile(c *gin.Context) {
 	})
 }
 
-func DoneMergeFile(guid string, suffix string, pathInfo string) {
+func DoneMergeFile(guid string, fileName string, pathInfo string) {
 	log.Println(pathInfo + "/" + guid)
 	log.Println(PathExists(pathInfo + "/" + guid))
 	if ok, _ := PathExists(pathInfo + "/" + guid); ok {
@@ -147,7 +148,7 @@ func DoneMergeFile(guid string, suffix string, pathInfo string) {
 
 		sort.Ints(data)
 		log.Println(data)
-		f, _ := os.OpenFile(pathInfo+"/"+guid+suffix, os.O_CREATE|os.O_APPEND|os.O_RDWR, 0777)
+		f, _ := os.OpenFile(pathInfo+"/"+fileName, os.O_CREATE|os.O_APPEND|os.O_RDWR, 0777)
 		for _, val := range data {
 			contents, _ := ioutil.ReadFile(pathInfo + "/" + guid + "/" + strconv.Itoa(val))
 			f.Write(contents)
