@@ -11,7 +11,6 @@ func InitRouter() {
 	router.Use(CorsMiddleware())
 	v1 := router.Group("v1")
 	{
-		v1.POST("/testinsert", Controllers.TestInsert)
 		v1.POST("/upload", Controllers.Upload)
 		v1.POST("/merge", Controllers.MergeFile)
 		v1.POST("/delete", Controllers.DeleteFile)
@@ -24,7 +23,7 @@ func CorsMiddleware() gin.HandlerFunc {
 		method := c.Request.Method
 
 			// 核心处理方式
-			c.Header("Access-Control-Allow-Origin", "http://47.102.149.201:8620")
+		    c.Header("Access-Control-Allow-Origin", "http://47.103.139.42:85")
 			c.Header("Access-Control-Allow-Headers", "Origin, X-Requested-With, content-type, Accept")
 			c.Header("Access-Control-Allow-Methods", "GET, OPTIONS, POST, PUT, DELETE")
 			c.Header("Access-Control-Max-Age", "1800")
