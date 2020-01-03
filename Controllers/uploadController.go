@@ -3,19 +3,19 @@ package Controllers
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/spf13/viper"
 	"io/ioutil"
+	"log"
 	"mime/multipart"
 	"net/http"
 	"os"
 	"path"
 	"sort"
-	"time"
-	"log"
 	"strconv"
+	"time"
 )
 
-var BathPathInfo = "D:/CUSTOMER"
-//var BathPathInfo = "/my/upload"
+
 
 type UploadNames struct {
 	Name    string
@@ -37,13 +37,14 @@ type DeleteFileData struct {
 }
 
 func TestInsert(c *gin.Context) {
+	var BathPathInfo = viper.GetString("path")
 	year := time.Now().Year()
 	month := int(time.Now().Month())
 	day := time.Now().Day()
 	fmt.Println(year, month, day)
 	c.JSON(http.StatusOK, gin.H{
 		"code":    1,
-		"message": "success",
+		"message": BathPathInfo,
 	})
 
 }
@@ -58,7 +59,7 @@ func Upload(c *gin.Context) {
 		return
 	}
 
-	pathInfo := BathPathInfo + "/" + savePath
+	pathInfo := viper.GetString("path") + "/" + savePath
 	log.Println(pathInfo)
 	file, err := c.FormFile("file")
 	if err != nil {
@@ -89,7 +90,7 @@ func DeleteFile(c *gin.Context) {
 	c.BindJSON(&d)
 
 	//删除文件
-	cuowu := os.RemoveAll(BathPathInfo + "/" + d.SavePath + "/")
+	cuowu := os.RemoveAll(viper.GetString("path") + "/" + d.SavePath + "/")
 	if cuowu != nil {
 		//如果删除失败则输出 file remove Error!
 		fmt.Println("file remove Error!")
@@ -125,7 +126,7 @@ func MergeFile(c *gin.Context) {
 		msg = "SavePath is null."
 	} else {
 		code = 0
-		DoneMergeFile(p.Identifier, p.FileName, BathPathInfo+"/"+p.SavePath)
+		DoneMergeFile(p.Identifier, p.FileName, viper.GetString("path")+"/"+p.SavePath)
 	}
 
 	c.JSON(http.StatusOK, gin.H{
@@ -147,7 +148,6 @@ func DoneMergeFile(guid string, fileName string, pathInfo string) {
 		}
 
 		sort.Ints(data)
-		log.Println(data)
 		f, _ := os.OpenFile(pathInfo+"/"+fileName, os.O_CREATE|os.O_APPEND|os.O_RDWR, 0777)
 		for _, val := range data {
 			contents, _ := ioutil.ReadFile(pathInfo + "/" + guid + "/" + strconv.Itoa(val))

@@ -14,6 +14,7 @@ func InitRouter() {
 		v1.POST("/upload", Controllers.Upload)
 		v1.POST("/merge", Controllers.MergeFile)
 		v1.POST("/delete", Controllers.DeleteFile)
+		v1.POST("/test", Controllers.TestInsert)
 	}
 	router.Run(":8622")
 }
