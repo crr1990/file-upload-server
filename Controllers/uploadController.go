@@ -75,9 +75,16 @@ func Upload(c *gin.Context) {
 	if ok, _ := PathExists(pathInfo + "/" + data.Guid); ok {
 
 	} else {
-		os.MkdirAll(pathInfo+"/"+data.Guid, 0777)
+		err := os.MkdirAll(pathInfo+"/"+data.Guid, 0777)
+		if err != nil {
+			log.Print(err)
+			return
+		}
 	}
-	c.SaveUploadedFile(file, pathInfo+"/"+data.Guid+"/"+data.Ids)
+	err = c.SaveUploadedFile(file, pathInfo+"/"+data.Guid+"/"+data.Name+data.Stuffix)
+	if err != nil {
+		log.Print(err)
+	}
 
 	c.JSON(http.StatusOK, gin.H{
 		"code":    0,
