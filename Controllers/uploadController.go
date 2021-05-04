@@ -15,8 +15,6 @@ import (
 	"time"
 )
 
-
-
 type UploadNames struct {
 	Name    string
 	Ids     string
@@ -89,6 +87,7 @@ func Upload(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"code":    0,
 		"message": "success",
+		"data":    viper.GetString("host") + savePath + "/" + data.Guid + "/" + data.Name + data.Stuffix,
 	})
 }
 func DeleteFile(c *gin.Context) {
