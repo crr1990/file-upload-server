@@ -132,7 +132,10 @@ func MergeFile(c *gin.Context) {
 		msg = "SavePath is null."
 	} else {
 		code = 0
-		DoneMergeFile(p.Identifier, p.FileName, viper.GetString("path")+"/"+p.SavePath)
+		err := DoneMergeFile(p.Identifier, p.FileName, viper.GetString("path")+"/"+p.SavePath)
+		if err != nil {
+			log.Println("MergeFileErr", err)
+		}
 	}
 
 	c.JSON(http.StatusOK, gin.H{
@@ -141,10 +144,11 @@ func MergeFile(c *gin.Context) {
 	})
 }
 
-func DoneMergeFile(guid string, fileName string, pathInfo string) {
+func DoneMergeFile(guid string, fileName string, pathInfo string) error {
 	log.Println(pathInfo + "/" + guid)
 	log.Println(PathExists(pathInfo + "/" + guid))
-	if ok, _ := PathExists(pathInfo + "/" + guid); ok {
+	ok, err := PathExists(pathInfo + "/" + guid)
+	if err == nil && ok {
 		var data []int
 		data = make([]int, 0)
 		fileInfo, _ := ioutil.ReadDir(pathInfo + "/" + guid)
@@ -154,15 +158,42 @@ func DoneMergeFile(guid string, fileName string, pathInfo string) {
 		}
 
 		sort.Ints(data)
-		f, _ := os.OpenFile(pathInfo+"/"+fileName, os.O_CREATE|os.O_APPEND|os.O_RDWR, 0777)
-		for _, val := range data {
-			contents, _ := ioutil.ReadFile(pathInfo + "/" + guid + "/" + strconv.Itoa(val))
-			f.Write(contents)
-			os.Remove(pathInfo + "/" + guid + "/" + strconv.Itoa(val))
+		f, err := os.OpenFile(pathInfo+"/"+fileName, os.O_CREATE|os.O_APPEND|os.O_RDWR, 0777)
+		if err != nil {
+			log.Println("DoneMergeFileErr", err)
+			return err
 		}
-		os.Remove(pathInfo + "/" + guid)
+
+		for _, val := range data {
+			contents, err := ioutil.ReadFile(pathInfo + "/" + guid + "/" + strconv.Itoa(val))
+			if err != nil {
+				log.Println("DoneMergeFileErr2", err)
+				continue
+			}
+			_, err = f.Write(contents)
+			if err != nil {
+				log.Println("DoneMergeFileErr3", err)
+				continue
+			}
+			err = os.Remove(pathInfo + "/" + guid + "/" + strconv.Itoa(val))
+			if err != nil {
+				log.Println("DoneMergeFileErr4", err)
+				continue
+			}
+		}
+		err = os.Remove(pathInfo + "/" + guid)
+		if err != nil {
+			log.Println("DoneMergeFileErr5", err)
+			return err
+		}
+
 		defer f.Close()
+	} else {
+		log.Println("DoneMergeFileFail", err, ok)
+		return err
 	}
+
+	return nil
 }
 
 /**
